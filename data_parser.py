@@ -218,6 +218,12 @@ def parse_gps(msg, relative_time):
         'alt': msg.altitude
     }
 
+def parse_altitude(msg, relative_time):
+    return {
+        'timestamp': relative_time,
+        'altitude': msg.data
+    }
+
 def parse_ros_message(label, msg, relative_time):
     if label.startswith('ols'):
         return parse_ols(label, msg, relative_time)
@@ -234,6 +240,8 @@ def parse_ros_message(label, msg, relative_time):
             return parse_trajectory(msg, relative_time)
         case 'gps':
             return parse_gps(msg, relative_time)
+        case 'altitude':
+            return parse_altitude(msg, relative_time)
         case _:
             base = {'timestamp': relative_time}
             if hasattr(msg, 'data') and isinstance(msg.data, (list, tuple, np.ndarray, array.array)):
@@ -248,19 +256,20 @@ def parse_ros_message(label, msg, relative_time):
 # ————————————————————————————————————————————————————————————
 
 if __name__ == "__main__":
-    bag_file = '/develop_ws/bag_files/rosbag2_2025_08_26-16_45_42/rosbag2_2025_08_26-16_45_42_0.db3'
+    bag_file = '/develop_ws/bag_files/flighttest_2025_08_13_redo/rosbag2_2025_09_03-18_31_25_0.db3'
     
     topics_to_extract = {
         '/mavros/imu/data': 'imu',
         '/mavros/rc/out': 'rcout',
         '/mavros/rc/in': 'rcin',
         '/trajectory': 'trajectory',
+        '/mavros/global_position/rel_alt': 'altitude',
+        '/mavros/local_position/odom': 'odometry',
         '/ols_rol': 'ols_rol',
         '/ols_pit': 'ols_pit',
         '/ols_yaw': 'ols_yaw',
         '/ols_rol_large': 'ols_rol_large',
-        '/ols_rol_yaw': 'ols_rol_yaw',
-        '/mavros/global_position/rel_alt': 'altitude'
+        '/ols_rol_yaw': 'ols_rol_yaw'
     }
 
 # ————————————————————————————————————————————————————————————
@@ -268,7 +277,7 @@ if __name__ == "__main__":
     output_directory_path = '/develop_ws/bag_files/topic_data_files'
 
     nanoseconds_per_second = 1e9
-    tolerance = 0.02
+    tolerance = 0.1
 
 
     db_connection, db_cursor = connect(bag_file)
