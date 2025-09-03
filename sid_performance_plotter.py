@@ -44,10 +44,18 @@ def _sliding_mse(
         raise ValueError("The true values array and predicted values array must have the same shape.")
     
     sliding_mse = list(np.full(window_size - 1, np.nan))
-    
-    for i in range(window_size - 1, len(true_values)):
-        true_window = true_values[i - window_size + 1:i + 1]
-        pred_window = pred_values[i - window_size + 1:i + 1]
+
+    if window_size % 2 == 0:
+        half_window = window_size // 2
+        offset_left = half_window - 1
+        offset_right = half_window
+    else:
+        half_window = window_size // 2
+        offset_left = offset_right = half_window
+
+    for i in range(offset_left, len(true_values) - offset_right):
+        true_window = true_values[i - offset_left : i + offset_right + 1]
+        pred_window = pred_values[i - offset_left : i + offset_right + 1]
         
         if np.isnan(true_window).any() or np.isnan(pred_window).any():
             mse = np.nan
@@ -70,10 +78,18 @@ def _sliding_cod(
         raise ValueError("The true values array and predicted values array must have the same shape.")
         
     sliding_cod = list(np.full(window_size - 1, np.nan))
-    
-    for i in range(window_size - 1, len(true_values)):
-        true_window = true_values[i - window_size + 1: i + 1]
-        pred_window = pred_values[i - window_size + 1: i + 1]
+
+    if window_size % 2 == 0:
+        half_window = window_size // 2
+        offset_left = half_window - 1
+        offset_right = half_window
+    else:
+        half_window = window_size // 2
+        offset_left = offset_right = half_window
+
+    for i in range(offset_left, len(true_values) - offset_right):
+        true_window = true_values[i - offset_left : i + offset_right + 1]
+        pred_window = pred_values[i - offset_left : i + offset_right + 1]
         
         if np.isnan(true_window).any() or np.isnan(pred_window).any():
             cod = np.nan
@@ -106,10 +122,18 @@ def _sliding_adjusted_cod(
         raise ValueError("The true values array and predicted values array must have the same shape.")
     
     sliding_cod = list(np.full(window_size - 1, np.nan))
-    
-    for i in range(window_size - 1, len(true_values)):
-        true_window = true_values[i - window_size + 1: i + 1]
-        pred_window = pred_values[i - window_size + 1: i + 1]
+
+    if window_size % 2 == 0:
+        half_window = window_size // 2
+        offset_left = half_window - 1
+        offset_right = half_window
+    else:
+        half_window = window_size // 2
+        offset_left = offset_right = half_window
+
+    for i in range(offset_left, len(true_values) - offset_right):
+        true_window = true_values[i - offset_left : i + offset_right + 1]
+        pred_window = pred_values[i - offset_left : i + offset_right + 1]
         
         if np.isnan(true_window).any() or np.isnan(pred_window).any():
             cod = np.nan
@@ -148,10 +172,18 @@ def _sliding_confidence_intervals(
     output_ci_array = np.full(num_samples, np.nan)
     param_ci_array = np.full((num_samples, num_predictors), np.nan)
 
-    for i in range(window_size - 1, num_samples):
-        true_window = true_values[i - window_size + 1: i + 1]
-        pred_window = pred_values[i - window_size + 1: i + 1]
-        X = predictors[i - window_size + 1: i + 1, :]
+    if window_size % 2 == 0:
+        half_window = window_size // 2
+        offset_left = half_window - 1
+        offset_right = half_window
+    else:
+        half_window = window_size // 2
+        offset_left = offset_right = half_window
+
+    for i in range(offset_left, num_samples - offset_right):
+        true_window = true_values[i - offset_left : i + offset_right + 1]
+        pred_window = pred_values[i - offset_left : i + offset_right + 1]
+        X = predictors[i - offset_left : i + offset_right + 1, :]
 
         if np.isnan(true_window).any() or np.isnan(pred_window).any() or np.isnan(X).any():
             continue
@@ -181,8 +213,16 @@ def _sliding_vif_cod(
 
     cod_array = np.full((num_samples, num_predictors), np.nan)
 
-    for i in range(window_size - 1, num_samples):
-        X = predictors[i - window_size + 1: i + 1, :]
+    if window_size % 2 == 0:
+        half_window = window_size // 2
+        offset_left = half_window - 1
+        offset_right = half_window
+    else:
+        half_window = window_size // 2
+        offset_left = offset_right = half_window
+
+    for i in range(offset_left, num_samples - offset_right):
+        X = predictors[i - offset_left : i + offset_right + 1, :]
 
         if np.isnan(X).any():
             continue
@@ -214,8 +254,16 @@ def _sliding_svd_cond(
 
     cond_array = np.full((num_samples, num_predictors), np.nan)
 
-    for i in range(window_size - 1, num_samples):
-        X = predictors[i - window_size + 1: i + 1, :]
+    if window_size % 2 == 0:
+        half_window = window_size // 2
+        offset_left = half_window - 1
+        offset_right = half_window
+    else:
+        half_window = window_size // 2
+        offset_left = offset_right = half_window
+
+    for i in range(offset_left, num_samples - offset_right):
+        X = predictors[i - offset_left : i + offset_right + 1, :]
 
         if np.isnan(X).any():
             continue
@@ -246,11 +294,19 @@ def _sliding_correlation_matrix(
     num_samples, num_features = predictors.shape
     if num_features >= window_size:
         raise ValueError("Number of predictors must be less than window size.")
-
+        
     corr_matrices = np.full((num_samples, num_features, num_features), np.nan)
 
-    for i in range(window_size - 1, num_samples):
-        X = predictors[i - window_size + 1: i + 1, :]
+    if window_size % 2 == 0:
+        half_window = window_size // 2
+        offset_left = half_window - 1
+        offset_right = half_window
+    else:
+        half_window = window_size // 2
+        offset_left = offset_right = half_window
+
+    for i in range(offset_left, num_samples - offset_right):
+        X = predictors[i - offset_left : i + offset_right + 1, :]
 
         if np.isnan(X).any():
             continue
@@ -260,7 +316,7 @@ def _sliding_correlation_matrix(
         corr_matrix = (X_norm.T @ X_norm)   # / (window_size - 1)
         corr_matrices[i] = corr_matrix
 
-    return corr_matrices   
+    return corr_matrices
 
 
 def extract_model(dataframe, prefix):
@@ -327,7 +383,7 @@ def process_models(dataframes: list[pd.DataFrame]):
         
         # modeled output confidence intervals (cis)
         regressors = df[[col for col in df.columns if re.match(rf"{prefix}regressor_\d+$", col)]]
-        modeled_output_cis, parameter_cis = _sliding_confidence_intervals(df[f"{prefix}measured_output"], df[f"{prefix}modeled_output"], regressors)
+        modeled_output_cis, parameter_cis = _sliding_confidence_intervals(df[f"{prefix}measured_output"], df[f"{prefix}modeled_output"], regressors, window_size=100)
         modeled_output_cis_label = f"{prefix}modeled_output_cis"
         df.insert(loc=3, column=modeled_output_cis_label, value=modeled_output_cis)
         
@@ -351,20 +407,20 @@ def process_models(dataframes: list[pd.DataFrame]):
         # coefficient of determination (cod)
         num_regressors = len([col for col in df.columns if re.match(rf"{prefix}regressor_\d+$", col)])
         # cod = _sliding_cod(df[f"{prefix}measured_output"], df[f"{prefix}modeled_output"], window_size=30)
-        cod = _sliding_adjusted_cod(df[f"{prefix}measured_output"], df[f"{prefix}modeled_output"], num_regressors, window_size=30)
+        cod = _sliding_adjusted_cod(df[f"{prefix}measured_output"], df[f"{prefix}modeled_output"], num_regressors, window_size=100)
         cod_label = f"{prefix}cod"
         df.insert(loc=7, column=cod_label, value=cod)
         
         # regressor coefficient of determinations (cod) from variance inflation factors (vif)
         regressors = df[[col for col in df.columns if re.match(rf"{prefix}regressor_\d+$", col)]]
-        regressors_cod = _sliding_vif_cod(regressors, window_size=30)
+        regressors_cod = _sliding_vif_cod(regressors, window_size=100)
         for j in range(regressors_cod.shape[1]):
             regressors_cod_label = f"{prefix}regressor_{j+1}_cod"
             df.insert(loc=len(df.columns), column=regressors_cod_label, value=regressors_cod[:, j])
         
         # regressor condition numbers (cond) from singular value decomposition (svd)
         regressors = df[[col for col in df.columns if re.match(rf"{prefix}regressor_\d+$", col)]]
-        regressors_cond = _sliding_svd_cond(regressors, window_size=30)
+        regressors_cond = _sliding_svd_cond(regressors, window_size=100)
         for j in range(regressors_cond.shape[1]):
             regressors_cond_label = f"{prefix}regressor_{j+1}_cond"
             df.insert(loc=len(df.columns), column=regressors_cond_label, value=regressors_cond[:, j])
@@ -386,7 +442,7 @@ def process_models(dataframes: list[pd.DataFrame]):
         regressor_cols = [col for col in df.columns if re.match(rf"{prefix}regressor_\d+$", col)]
         regressors = df[regressor_cols]
         num_regressors = len(regressor_cols)
-        correlation_matrix = _sliding_correlation_matrix(regressors, window_size=30)
+        correlation_matrix = _sliding_correlation_matrix(regressors, window_size=100)
         for j in range(num_regressors):
             for k in range(num_regressors):
                 if j != k:
@@ -394,10 +450,9 @@ def process_models(dataframes: list[pd.DataFrame]):
                     correlation_element_label = f"{prefix}correlation_{j}_to_{k}"
                     df.insert(loc=len(df.columns), column=correlation_element_label, value=correlation_element)
         
-        
     return dataframes
-        
-        
+
+
 def plot_models(
         dataframes: list[pd.DataFrame],
         start_time: float | None = None,
@@ -473,7 +528,7 @@ def plot_models(
     axs[0].set_title("Measured vs Estimated Outputs")
     axs[0].set_ylabel(plot_labels.get("output_amp", "Output Amplitude"))
     axs[0].set_xlabel(plot_labels.get("time", "Time [s]"))
-    axs[0].legend(loc='upper right')
+    axs[0].legend(loc='upper right', fontsize='medium')
     
     for i in range(max_num_params):
         axs[1 + i].set_title(f"Parameter {chr(65+i)} Over Time")
@@ -491,7 +546,7 @@ def plot_models(
 
     plt.tight_layout(rect=[0, 0, 1, 0.97])
     plt.show()
-
+    
 def plot_confidence(
         dataframes: list[pd.DataFrame],
         start_time: float | None = None,
@@ -575,7 +630,7 @@ def plot_confidence(
     axs[0].set_title("Measured vs Estimated Outputs")
     axs[0].set_ylabel(plot_labels.get("output_amp", "Output Amplitude"))
     axs[0].set_xlabel(plot_labels.get("time", "Time [s]"))
-    axs[0].legend(loc='upper right')
+    axs[0].legend(loc='upper right', fontsize='medium')
     
     for i in range(max_num_params):
         axs[1 + i].set_title(f"Parameter {chr(65+i)} Over Time")
@@ -666,7 +721,7 @@ def plot_percent_confidence(
     axs[0].set_title("Estimated Output's Percent Confidence Over Time")
     axs[0].set_ylabel(plot_labels.get("output_percent_confidence", "Output Percent\nConfidence [%]"))
     axs[0].set_xlabel(plot_labels.get("time", "Time [s]"))
-    axs[0].legend(loc='upper right')
+    axs[0].legend(loc='upper right', fontsize='medium')
     
     for i in range(max_num_params):
         axs[1 + i].set_title(f"Parameter {chr(65+i)}'s Percent Confidence Over Time")
@@ -678,7 +733,7 @@ def plot_percent_confidence(
     for ax in axs:
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)
-        formatter.set_powerlimits((-2, 2))
+        formatter.set_powerlimits((-3, 3))
         ax.yaxis.set_major_formatter(formatter)
         ax.grid(True)
 
@@ -768,10 +823,10 @@ def plot_error(
     for ax in axs:
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)
-        formatter.set_powerlimits((-2, 2))
+        formatter.set_powerlimits((-3, 3))
         ax.yaxis.set_major_formatter(formatter)
         ax.grid(True)
-        ax.legend(loc='upper right')
+        axs[0].legend(loc='upper right', fontsize='medium')
     
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
@@ -860,20 +915,26 @@ def plot_fit(
     axs[0].set_title("Coefficient of Determination (R²) Over Time")
     axs[0].set_ylabel(plot_labels.get("cod_amp", "R² [%]"))
     axs[0].set_xlabel(plot_labels.get("time", "Time [s]"))
-    axs[0].legend(loc='upper right')
+    axs[0].legend(loc='upper right', fontsize='medium')
     axs[0].set_ylim(0, 1)
+    axs[0].axhspan(0.75, 1.00, color='#A8D5BA', alpha=0.3)  # green
+    axs[0].axhspan(0.50, 0.75, color='#FFF3B0', alpha=0.3)  # yellow
+    axs[0].axhspan(0.00, 0.50, color='#F4CCCC', alpha=0.3)  # red
     
     for i in range(max_num_params):
-        axs[1 + i].set_title(f"Parameter {chr(65+i)}'s Coefficient of Determination (r²) Over Time")
+        axs[1 + i].set_title(f"Parameter {chr(65+i)}'s Fit (r²) Over Time")
         param_key = f"param_{i+1}_cod_amp"
         default_label = f"Parameter {chr(65+i)}'s\nr² [%]"
         axs[1 + i].set_ylabel(plot_labels.get(param_key, default_label))
         axs[1 + i].set_ylim(0, 1)
+        axs[1 + i].axhspan(0.90, 1.00, color='#F4CCCC', alpha=0.3)  # red
+        axs[1 + i].axhspan(0.75, 0.90, color='#FFF3B0', alpha=0.3)  # yellow
+        axs[1 + i].axhspan(0.00, 0.75, color='#A8D5BA', alpha=0.3)  # green
     axs[-1].set_xlabel(plot_labels.get("time", "Time [s]"))
 
     formatter = ScalarFormatter(useMathText=True)
     formatter.set_scientific(True)
-    formatter.set_powerlimits((-2, 2))
+    formatter.set_powerlimits((-3, 3))
     for ax in axs:
         ax.yaxis.set_major_formatter(formatter)
         ax.grid(True)
@@ -963,7 +1024,7 @@ def plot_conditioning(
     axs[0].set_title("Max Condition Number Over Time")
     axs[0].set_ylabel(plot_labels.get("cond_amp", "Amplitude"))
     axs[0].set_xlabel(plot_labels.get("time", "Time [s]"))
-    axs[0].legend(loc='upper right')
+    axs[0].legend(loc='upper right', fontsize='medium')
     
     for i in range(max_num_params):
         axs[1 + i].set_title(f"Parameter {chr(65+i)} Over Time")
@@ -975,8 +1036,9 @@ def plot_conditioning(
     for ax in axs:
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)
-        formatter.set_powerlimits((-2, 2))
+        formatter.set_powerlimits((-3, 3))
         ax.yaxis.set_major_formatter(formatter)
+        ax.set_yscale("log")
         ax.grid(True)
 
     plt.tight_layout(rect=[0, 0, 1, 0.97])
@@ -1011,7 +1073,9 @@ def plot_correlation(
             )
         num_params = len(param_cols)
         fig, axs = plt.subplots(num_params, 1, figsize=(12, (2*num_params)), sharex=True)
-        if num_params == 1:
+        if isinstance(axs, np.ndarray):
+            axs = axs.tolist()
+        else:
             axs = [axs]
         
         base_title = "Parameter Estimator Performance - Figure 7"
@@ -1026,27 +1090,40 @@ def plot_correlation(
             df = df[df["timestamp"] <= end_time]
 
         time = df["timestamp"]
+        
+        regressors = df[[col for col in df.columns if re.match(rf"{prefix}regressor_\d+$", col)]]
+        correlation_matrix_batch = _sliding_correlation_matrix(regressors, len(regressors))[-1]
+        
         for j in range(num_params):
             ax = axs[j]
             for k in range(num_params):
                 if j == k:
                     continue
+                
+                param_color = color_cycle[k % len(color_cycle)]
+                
                 col_name = f"{prefix}correlation_{j}_to_{k}"
                 if col_name in df.columns:
-                    param_color = color_cycle[k % len(color_cycle)]
                     ax.plot(time, df[col_name], label=f"corr({chr(65+j)}, {chr(65+k)})", color=param_color)
+                    
+                ax.axhline(correlation_matrix_batch[j, k], linestyle=':', color=param_color, alpha=0.7)
                     
             ax.set_title(f"Parameter {chr(65 + j)}'s Correlation Over Time")
             ax.set_ylabel(f"Param {chr(65 + j)}\nCorrelation")
-            ax.set_ylim(-1, 1)
+            ax.legend(loc='upper right', fontsize='medium')
             ax.grid(True)
-            ax.legend(loc='upper right')
+            ax.set_ylim(-1, 1)
+            ax.axhspan( 0.90,  1.00, color='#F4CCCC', alpha=0.3)  # red
+            ax.axhspan( 0.75,  0.90, color='#FFF3B0', alpha=0.3)  # yellow
+            ax.axhspan(-0.75,  0.75, color='#A8D5BA', alpha=0.3)  # green
+            ax.axhspan(-0.90, -0.75, color='#FFF3B0', alpha=0.3)  # yellow
+            ax.axhspan(-1.00, -0.90, color='#F4CCCC', alpha=0.3)  # red
             
         axs[-1].set_xlabel(plot_labels.get("time", "Time [s]"))
 
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)
-        formatter.set_powerlimits((-2, 2))
+        formatter.set_powerlimits((-3, 3))
         for ax in axs:
             ax.yaxis.set_major_formatter(formatter)
 
@@ -1057,12 +1134,13 @@ def plot_correlation(
 if __name__ == "__main__":
     get_ipython().run_line_magic('matplotlib', 'qt')
     # get_ipython().run_line_magic('matplotlib', 'inline')
-    csv_path = "M:/cUAS Unclassified/125 - Mosley/OLS Model Results/synced_all_data_10m.csv"
+    csv_path = "M:/cUAS Unclassified/125 - Mosley/OLS Model Results/synced_all_data.csv"
     # csv_path = "M:/cUAS Unclassified/125 - Mosley/OLS Model Results/ols_rol_data.csv"
     
-    models = ['ols_rol_', 'ols_rol_large_', 'ols_rol_yaw_']
-    start_time = 217
-    end_time = 235
+    models = ['ols_rol_']
+    # 
+    start_time = 0
+    end_time = 500
     plot_labels = {
     "subtitle": "Roll Models",
     "time": "Time [s]",
@@ -1080,19 +1158,19 @@ if __name__ == "__main__":
     "param_2_cod_amp": "Aileron\nParameter's r²\n[%]",
     "param_3_cod_amp": "Yaw Velocity\nParameter's r²\n[%]",
     "param_4_cod_amp": "Rudder\nParameter's r²\n[%]",
-    "param_1_cond_amp": "Roll Velocity\nParameter's Conditioning",
-    "param_2_cond_amp": "Aileron\nParameter's Conditioning",
-    "param_3_cond_amp": "Yaw Velocity\nParameter's Conditioning",
-    "param_4_cond_amp": "Rudder\nParameter's Conditioning",
+    "param_1_cond_amp": "Roll Velocity\nParameter's\nConditioning",
+    "param_2_cond_amp": "Aileron\nParameter's\nConditioning",
+    "param_3_cond_amp": "Yaw Velocity\nParameter's\nConditioning",
+    "param_4_cond_amp": "Rudder\nParameter's\nConditioning",
     }
 
     csv = pd.read_csv(csv_path)
     model_dfs = {prefix: extract_model(csv, prefix) for prefix in models}
     processed_models = process_models(list(model_dfs.values()))
     # plot_models(processed_models, start_time, end_time, plot_labels)
-    # plot_confidence(processed_models,  start_time, end_time, plot_labels)
-    # plot_percent_confidence(processed_models,  start_time, end_time, plot_labels)
-    # plot_error(processed_models, start_time, end_time, plot_labels)
-    # plot_fit(processed_models,  start_time, end_time, plot_labels)
-    # plot_conditioning(processed_models, start_time, end_time, plot_labels)
+    plot_confidence(processed_models,  start_time, end_time, plot_labels)
+    plot_percent_confidence(processed_models,  start_time, end_time, plot_labels)
+    plot_error(processed_models, start_time, end_time, plot_labels)
+    plot_fit(processed_models,  start_time, end_time, plot_labels)
+    plot_conditioning(processed_models, start_time, end_time, plot_labels)
     plot_correlation(processed_models, start_time, end_time, plot_labels)
