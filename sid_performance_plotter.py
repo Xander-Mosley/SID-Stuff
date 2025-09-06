@@ -1169,7 +1169,7 @@ if __name__ == "__main__":
     processed_models = process_models(list(model_dfs.values()))
     # plot_models(processed_models, start_time, end_time, plot_labels)
     plot_confidence(processed_models,  start_time, end_time, plot_labels)
-    plot_percent_confidence(processed_models,  start_time, end_time, plot_labels)
+    # plot_percent_confidence(processed_models,  start_time, end_time, plot_labels)
     plot_error(processed_models, start_time, end_time, plot_labels)
     plot_fit(processed_models,  start_time, end_time, plot_labels)
     plot_conditioning(processed_models, start_time, end_time, plot_labels)
