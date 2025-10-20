@@ -1134,17 +1134,13 @@ def plot_correlation(
 if __name__ == "__main__":
     get_ipython().run_line_magic('matplotlib', 'qt')
     # get_ipython().run_line_magic('matplotlib', 'inline')
+    csv_path = "M:/cUAS Unclassified/125 - Mosley/OLS Model Results/synced_all_data_10m.csv"
+    # csv_path = "M:/cUAS Unclassified/125 - Mosley/OLS Model Results/ols_rol_data.csv"
     
-    csv_path = "/home/cuav/Desktop/coding_projects/ANTX25/Topic CSVs/Day3_1456/synced_all_data.csv"
-
-    models = ['ols_rol_', 'ols_rol_large_']
-    
-    # Day1_1714: 135.5-165.5, 345.75-375.75
-    # Day1_1722: 16-46, 126-156, 222-252
-    # Day2_1459: 18-48, 118-148, 218-248
-    start_time = 211
-    end_time = 241
-    
+    models = ['ols_rol_']
+    # 
+    start_time = 26
+    end_time = 38
     plot_labels = {
     "subtitle": "Roll Models",
     "time": "Time [s]",
@@ -1171,11 +1167,10 @@ if __name__ == "__main__":
     csv = pd.read_csv(csv_path)
     model_dfs = {prefix: extract_model(csv, prefix) for prefix in models}
     processed_models = process_models(list(model_dfs.values()))
-    
     # plot_models(processed_models, start_time, end_time, plot_labels)
     plot_confidence(processed_models,  start_time, end_time, plot_labels)
-    # plot_percent_confidence(processed_models,  start_time, end_time, plot_labels)
+    plot_percent_confidence(processed_models,  start_time, end_time, plot_labels)
     plot_error(processed_models, start_time, end_time, plot_labels)
-    # plot_fit(processed_models,  start_time, end_time, plot_labels)
-    # plot_conditioning(processed_models, start_time, end_time, plot_labels)
-    # plot_correlation(processed_models, start_time, end_time, plot_labels)
+    plot_fit(processed_models,  start_time, end_time, plot_labels)
+    plot_conditioning(processed_models, start_time, end_time, plot_labels)
+    plot_correlation(processed_models, start_time, end_time, plot_labels)
