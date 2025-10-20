@@ -174,6 +174,17 @@ def parse_imu(msg, relative_time):
         'gz': msg.angular_velocity.z
     }
 
+def parse_imu_raw(msg, relative_time):
+    return {
+        'timestamp': relative_time,
+        'ax_raw': msg.linear_acceleration.x,
+        'ay_raw': msg.linear_acceleration.y,
+        'az_raw': msg.linear_acceleration.z,
+        'gx_raw': msg.angular_velocity.x,
+        'gy_raw': msg.angular_velocity.y,
+        'gz_raw': msg.angular_velocity.z
+    }
+
 def parse_rcout(msg, relative_time):
     return {
         'timestamp': relative_time,
@@ -230,6 +241,8 @@ def parse_ros_message(label, msg, relative_time):
     match label:
         case 'imu':
             return parse_imu(msg, relative_time)
+        case 'imu_raw':
+            return parse_imu_raw(msg, relative_time)
         case 'rcout':
             return parse_rcout(msg, relative_time)
         case 'rcin':
@@ -256,20 +269,27 @@ def parse_ros_message(label, msg, relative_time):
 # ————————————————————————————————————————————————————————————
 
 if __name__ == "__main__":
-    bag_file = '/develop_ws/bag_files/flighttest_2025_08_13_redo/rosbag2_2025_09_03-18_31_25_0.db3'
+    bag_file = '/develop_ws/bag_files/SCANTX_2025_09_12-RollTests-rerun/rosbag2_2025_09_17-16_50_42_0.db3'
     
     topics_to_extract = {
         '/mavros/imu/data': 'imu',
+        '/mavros/imu/data_raw': 'imu_raw',
         '/mavros/rc/out': 'rcout',
         '/mavros/rc/in': 'rcin',
         '/trajectory': 'trajectory',
         '/mavros/global_position/rel_alt': 'altitude',
         '/mavros/local_position/odom': 'odometry',
+        '/mavros/imu/diff_pressure': 'diff_pressure',
+        '/mavros/imu/static_pressure': 'static_pressure',
+        '/mavros/imu/temperature_baro': 'temperature_baro',
         '/ols_rol': 'ols_rol',
         '/ols_pit': 'ols_pit',
         '/ols_yaw': 'ols_yaw',
         '/ols_rol_large': 'ols_rol_large',
-        '/ols_rol_yaw': 'ols_rol_yaw'
+        '/ols_rol_yaw': 'ols_rol_yaw',
+        '/ols_rol_moment': 'ols_rol_moment',
+        '/ols_Y_dim': 'ols_Y_dim',
+        '/ols_rol_nondim': 'ols_rol_nondim'
     }
 
 # ————————————————————————————————————————————————————————————
@@ -277,7 +297,7 @@ if __name__ == "__main__":
     output_directory_path = '/develop_ws/bag_files/topic_data_files'
 
     nanoseconds_per_second = 1e9
-    tolerance = 0.1
+    tolerance = 0.02
 
 
     db_connection, db_cursor = connect(bag_file)
